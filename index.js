@@ -21,31 +21,21 @@ const Contact = require('./models/Contacte');
 const Messages = require('./models/Messages');
 const translate = require('translate-google');
 const isAuthenticated = require('./middleware/isAuthenticated');
+const CLIENT_URL = "https://linkerfolio.vercel.app"
+// const CLIENT_URL = "http://localhost:3000"
 
-// const { createClient } = require('redis');
-
-// // TEST REDIS
-// const client = createClient({
-//     password: process.env.REDIS_PASSWORD,
-//     socket: {
-//         host: 'redis-19685.c61.us-east-1-3.ec2.redns.redis-cloud.com',
-//         port: 19685
-//     }
-// });
-// client.connect(console.log("Connect To Reddis")).catch(console.error);
 
 
 // app.use(cors());
-
 app.use(cors({
-  origin: '*',
+  origin: CLIENT_URL,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
 }));
 
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: CLIENT_URL,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
   }
 });
@@ -89,7 +79,7 @@ server.listen(PORT, () => {
 
 // CORS middleware
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
