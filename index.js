@@ -21,8 +21,8 @@ const Contact = require('./models/Contacte');
 const Messages = require('./models/Messages');
 const translate = require('translate-google');
 const isAuthenticated = require('./middleware/isAuthenticated');
-const CLIENT_URL = "https://linkerfolio.vercel.app"
-// const CLIENT_URL = "http://localhost:3000"
+// const CLIENT_URL = "https://linkerfolio.vercel.app"
+const CLIENT_URL = "http://localhost:3000"
 
 
 
@@ -79,7 +79,7 @@ server.listen(PORT, () => {
 
 // CORS middleware
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
+  res.setHeader('Access-Control-Allow-Origin', "*");
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
