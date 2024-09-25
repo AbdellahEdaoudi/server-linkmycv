@@ -14,7 +14,6 @@ const socketIo = require('socket.io');
 const server = http.createServer(app);
 const cors = require('cors');
 const { connectDB } = require('./config/dbConnect');
-const { allowedOrigins } = require('./config/allowedOrigins');
 const { corsOption } = require(path.join(__dirname, 'config', 'corsOptions'));
 const upload = require('./middleware/multer');
 const Links = require('./models/Links');
@@ -34,7 +33,7 @@ const isAuthenticated = require('./middleware/isAuthenticated');
   
 const io = socketIo(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "https://linkerfolio.vercel.app",
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
   }
 });
