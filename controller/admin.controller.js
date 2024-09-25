@@ -23,36 +23,24 @@ exports.registerAdmin = async (req, res) => {
     });
 
     await user.save();
-
     const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          id: user._id,
-        },
-      },
+      { UserInfo: { id: user._id, role: user.role } },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "30m" }
     );
     const refreshToken = jwt.sign(
-      {
-        UserInfo: {
-          id: user._id,
-        },
-      },
+      { UserInfo: { id: user._id, role: user.role } },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "7d" }
     );
-
     res.cookie("jwt", refreshToken, {
-      httpOnly: true, //accessible only by web server
-      secure: true, //https
-      sameSite: "None", //cross-site cookie
+      httpOnly: true,
+      secure: false,  // true for https 
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
     res.json({
       accessToken,
-      email: user.email,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -77,38 +65,66 @@ exports.loginAdmin = async (req, res) => {
     if (!match) return res.status(401).json({ message: "Wrong Password" });
 
     const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          id: foundUser._id,
-        },
-      },
+      { UserInfo: { id: foundUser._id, role: foundUser.role } },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "60m" }
+      { expiresIn:15}
     );
     const refreshToken = jwt.sign(
-      {
-        UserInfo: {
-          id: foundUser._id,
-        },
-      },
+      { UserInfo: { id: foundUser._id, role: foundUser.role } },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "7d" }
     );
-
     res.cookie("jwt", refreshToken, {
-      httpOnly: true, //accessible only by web server
-      secure: true, //https
-      sameSite: "None", //cross-site cookie
+      httpOnly: true,
+      secure: false,  // true for https
+      sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
     res.json({
       accessToken,
-      email: foundUser.email,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+exports.refresh = (req, res) => {
+  const cookies = req.cookies;
+  console.log("Cookies:", cookies); 
+  if (!cookies?.jwt) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  
+  const refreshToken = cookies.jwt;
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    
+    const foundUser = await Admin.findById(user.UserInfo.id).exec();
+    if (!foundUser) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const accessToken = jwt.sign(
+      { UserInfo: { id: foundUser._id, role: foundUser.role } },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "30m"}
+    );
+    
+    return res.json({ accessToken });
+  });
+};
+
+exports.logout = (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(204); //No content
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true,
+  });
+  res.json({ message: 'Cookie cleared' });
 };
 
 
@@ -123,7 +139,7 @@ exports.getAllAdmins = async (req, res) => {
 exports.deleteAdminById = async (req, res) => {
   try {
     const { id } = req.params;
-    const admin = await Admin.findByIdAndDelete(id).exec();
+    const admin = await Admin.findByIdAndDelete({_id:id}).exec();
 
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
