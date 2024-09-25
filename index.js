@@ -1,8 +1,6 @@
 require('dotenv').config();
-const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
-app.use(express.json());
 const PORT = 9999;
 const path = require("path")
 const UserController = require("./controller/user.controller")
@@ -13,12 +11,11 @@ const AdmineController = require("./controller/admin.controller")
 const friendRequestController = require("./controller/friends.controller")
 const http = require('http');
 const socketIo = require('socket.io');
-const User = require('./models/User');
 const server = http.createServer(app);
 const cors = require('cors');
 const { connectDB } = require('./config/dbConnect');
-const { corsOption } = require('./config/corsoptions');
 const { allowedOrigins } = require('./config/allowedOrigins');
+const { corsOption } = require(path.join(__dirname, 'config', 'corsOptions'));
 const upload = require('./middleware/multer');
 const Links = require('./models/Links');
 const Contact = require('./models/Contacte');
@@ -30,11 +27,11 @@ const isAuthenticated = require('./middleware/isAuthenticated');
 
 // app.use(cors());
 // app.use(cors({
-//   origin: CLIENT_URL,
-//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-//   credentials: true
-// }));
-
+  //   origin: CLIENT_URL,
+  //   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  //   credentials: true
+  // }));
+  
 const io = socketIo(server, {
   cors: {
     origin: allowedOrigins,
@@ -67,7 +64,7 @@ io.on('connection', (socket) => {
   socket.on('deleteFriendRequest', (id) => {
     io.emit('receiveDeletedFriendRequest', id);
   });
-
+  
   socket.on('disconnect', () => {
     console.log('A user disconnected');
   });
@@ -80,6 +77,7 @@ server.listen(PORT, () => {
 
 connectDB()
 app.use(cors(corsOption));
+app.use(express.json());
 // User Routes
 app.get('/users',isAuthenticated,UserController.getUsers);
 app.get('/users/:id',isAuthenticated,UserController.getUserById);
