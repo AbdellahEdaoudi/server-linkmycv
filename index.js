@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 const PORT = 9999;
+const path = require("path")
 const UserController = require("./controller/user.controller")
 const MessageController = require("./controller/msg.controller")
 const LinksController = require("./controller/links.controller")
@@ -15,27 +16,28 @@ const socketIo = require('socket.io');
 const User = require('./models/User');
 const server = http.createServer(app);
 const cors = require('cors');
+const { connectDB } = require('./config/dbConnect');
+const { corsOption } = require('./config/corsoptions');
+const { allowedOrigins } = require('./config/allowedOrigins');
 const upload = require('./middleware/multer');
 const Links = require('./models/Links');
 const Contact = require('./models/Contacte');
 const Messages = require('./models/Messages');
 const translate = require('translate-google');
 const isAuthenticated = require('./middleware/isAuthenticated');
-const CLIENT_URL = "https://linkerfolio.vercel.app"
-// const CLIENT_URL = "http://localhost:3000"
 
 
 
 // app.use(cors());
-app.use(cors({
-  origin: CLIENT_URL,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  credentials: true
-}));
+// app.use(cors({
+//   origin: CLIENT_URL,
+//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//   credentials: true
+// }));
 
 const io = socketIo(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
   }
 });
@@ -76,25 +78,8 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
-// CORS middleware
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', "*");
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
-mongoose.set('strictQuery', true);
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log(`Connect to Mongodb Atlas`);
-  })
-  .catch(err => {
-    console.error(err);
-  });
-
-
+connectDB()
+app.use(cors(corsOption));
 // User Routes
 app.get('/users',isAuthenticated,UserController.getUsers);
 app.get('/users/:id',isAuthenticated,UserController.getUserById);
@@ -207,5 +192,21 @@ app.post('/translate',isAuthenticated,async (req, res) => {
   } catch (error) {
     console.error('Server error:', error.message);
     res.status(500).json({ error: 'Failed to translate text object' });
+  }
+});
+
+
+app.use("/",express.static(path.join(__dirname,"public")));
+app.get('/',(req,res)=>{
+  res.sendFile(path.join(__dirname,"./Views/index.html"))
+})
+app.all("*", (req, res) => {
+  res.status(404);
+  if (req.accepts("html")) {
+    res.sendFile(path.join(__dirname, "views", "404.html"));
+  } else if (req.accepts("json")) {
+    res.json({ message: "404 Not Found" });
+  } else {
+    res.type("txt").send("404 Not Found");
   }
 });
