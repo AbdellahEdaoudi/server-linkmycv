@@ -130,12 +130,12 @@ app.get('/friend/:id', isAuthenticated, friendRequestController.getFriendRequest
 app.put('/friend/:id', isAuthenticated, friendRequestController.updateFriendRequest);
 app.delete('/friend/:id', isAuthenticated, friendRequestController.deleteFriendRequest);
 app.post('/friends', isAuthenticated,requestsLimiter,friendRequestController.addFriendRequests);
-app.delete('/friends', isAuthenticated, friendRequestController.deleteAllFriendRequests);
 
 // Deletes Routes
-app.delete("/dl", isAuthenticated, deletesController.deleteLinks)
-app.delete("/dc", isAuthenticated, deletesController.deleteContacts)
-app.delete("/dm", deletesController.deleteMessages)
+app.delete("/dl",isAuthenticated,deletesController.deleteLinks)
+app.delete("/dc",isAuthenticated,deletesController.deleteContacts)
+app.delete("/dm",isAuthenticated,deletesController.deleteMessages)
+app.delete("/df",isAuthenticated,deletesController.deleteFriendReq)
 // Translate Route
 app.post("/translate", isAuthenticated, translateController.translateCV)
 

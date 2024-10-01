@@ -1,4 +1,5 @@
 const Contacte = require('../models/Contacte');
+const FriendRequest = require('../models/FriendRequest');
 const Links = require('../models/Links');
 const Messages = require('../models/Messages');
 
@@ -23,6 +24,14 @@ exports.deleteContacts = async (req, res) => {
 exports.deleteMessages = async (req, res) => {
   try {
     const result = await Messages.deleteMany({ toimg: { $ne: "toimg" } });
+    res.status(200).json({ message: "Messages have been deleted.", result });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while deleting messages.", error });
+  }
+};
+exports.deleteFriendReq = async (req, res) => {
+  try {
+    const result = await FriendRequest.deleteMany({ from: { $ne: "f" } });
     res.status(200).json({ message: "Messages have been deleted.", result });
   } catch (error) {
     res.status(500).json({ message: "An error occurred while deleting messages.", error });
