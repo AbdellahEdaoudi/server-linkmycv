@@ -57,6 +57,9 @@ io.on('connection', (socket) => {
   socket.on('deleteMessage', (id) => {
     io.emit('receiveDeletedMessage', id);
   });
+  socket.on('updateReadOrNo', (data) => {
+    io.emit('receiveReadOrNoUpdate', data);
+  });
 
   // friendRequest
   socket.on('sendFriendRequest', (data) => {
@@ -97,10 +100,9 @@ app.delete('/users/:id', isAuthenticated, UserController.deleteUserById);
 app.get('/messages', isAuthenticated, MessageController.getMessages);
 app.get('/messages/:id', isAuthenticated, MessageController.getMessageById);
 app.post('/messages',isAuthenticated,messageLimiter,MessageController.createMessage);
-app.put('/messages/:id', isAuthenticated, MessageController.updateMessageById);
+app.put('/messages/:id', isAuthenticated,messageLimiter,MessageController.updateMessageById);
 app.put('/readorno', isAuthenticated, MessageController.updateReadOrNoForMessages);
 app.delete('/messages/:id', isAuthenticated, MessageController.deleteMessageById);
-app.delete('/messages', isAuthenticated, MessageController.deleteAllMessages);
 app.delete('/messages_B_U', isAuthenticated, MessageController.deleteMessagesBetweenUsers);
 
 // Links route 

@@ -64,31 +64,25 @@ exports.deleteMessageById = async (req, res) => {
   }
 };
   
-// Delete all messages
-exports.deleteAllMessages = async (req, res) => {
-  try {
-    const msg = await Messages.deleteMany();
-    res.status(200).json({ message: ` ${msg.deletedCount} : All messages deleted successfully`});
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 exports.updateReadOrNoForMessages = async (req, res) => {
   const { fromEmail, toEmail } = req.body;
-
   try {
     const result = await Messages.updateMany(
-      { from: fromEmail, to: toEmail ,readorno:false},
+      { from: fromEmail, to: toEmail, readorno: false },
       { readorno: true },
       { new: true, runValidators: true }
     );
-
-    res.status(200).json({ message: 'Messages updated successfully', result });
+    const updatedMessages = await Messages.find(
+      { from: fromEmail, to: toEmail }
+    );
+    res.status(200).json({ message: 'Messages updated successfully', result: updatedMessages });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+
 // Delete messages between two users if they exist
 exports.deleteMessagesBetweenUsers = async (req, res) => {
   try {
