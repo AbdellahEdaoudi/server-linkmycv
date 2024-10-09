@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const cloudinary = require("../utils/cloudinary");
-const upload = require("../middleware/multer");
+const sanitizeHtml = require('sanitize-html');
+
 
 
 // Get all users
@@ -29,7 +30,14 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
   const userData = req.body;
-  
+  for (const key in userData) {
+    if (typeof userData[key] === 'string') {
+      userData[key] = sanitizeHtml(userData[key]);
+    }
+  }
+  if (userData.username) {
+    userData.username = userData.username.replace(/\s/g, '').toLowerCase();
+  }
   try {
     // Check if the username already exists
     const existingUser = await User.findOne({ username: userData.username });
@@ -44,12 +52,27 @@ const createUser = async (req, res) => {
   }
 };
 
-
+const capitalizeWords = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\s+/g, ' ');
+};
 // Update user by ID
 const updateUserById = async (req, res) => {
-  const { id } = req.params;
-  const userData = req.body;
-
+   const { id } = req.params;
+   const userData = req.body;
+   for (const key in userData) {
+    if (typeof userData[key] === 'string') {
+      userData[key] = sanitizeHtml(userData[key]);
+    }
+  }
+   if (userData.fullname) {
+     userData.fullname = capitalizeWords(userData.fullname);
+   }
+   if (userData.username) {
+     userData.username = userData.username.replace(/\s/g, '').toLowerCase();
+   }
   try {
     // Check if the username already exists
     if (userData.username) {

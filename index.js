@@ -11,6 +11,7 @@ const AdmineController = require("./controller/admin.controller")
 const friendRequestController = require("./controller/friends.controller")
 const deletesController = require("./controller/deletes.controller")
 const translateController = require("./controller/translate.controller")
+const emailController = require('./controller/emailController'); 
 const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
@@ -24,6 +25,7 @@ const { contactLimiter } = require('./Limiting/contactLimiter');
 const { linksLimiter } = require('./Limiting/linksLimiter');
 const { requestsLimiter } = require('./Limiting/requestsLimiter');
 const cookiesParser = require("cookie-parser");
+
 
 // const Server_Url = "http://localhost:3000"
 const Server_Url = "https://linkerfolio.vercel.app"
@@ -140,6 +142,9 @@ app.delete("/dm",isAuthenticated,deletesController.deleteMessages)
 app.delete("/df",isAuthenticated,deletesController.deleteFriendReq)
 // Translate Route
 app.post("/translate", isAuthenticated, translateController.translateCV)
+// SEND EMAIL
+app.post('/SendEmail', emailController.sendEmail);
+app.post('/SendEmailAll', emailController.sendEmailAll);
 
 
 

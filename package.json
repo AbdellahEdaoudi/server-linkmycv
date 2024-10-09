@@ -25,6 +25,7 @@
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.4",
     "redis": "^4.6.15",
+    "sanitize-html": "^2.13.1",
     "socket.io": "^4.7.5",
     "translate-google": "^1.5.0"
   }
