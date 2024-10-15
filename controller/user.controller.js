@@ -62,6 +62,10 @@ const capitalizeWords = (str) => {
 const updateUserById = async (req, res) => {
    const { id } = req.params;
    const userData = req.body;
+   
+   if ('email' in userData) {
+    delete userData.email;
+  }
    for (const key in userData) {
     if (typeof userData[key] === 'string') {
       userData[key] = sanitizeHtml(userData[key]);

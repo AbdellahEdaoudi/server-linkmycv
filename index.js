@@ -20,6 +20,8 @@ const { connectDB } = require('./config/dbConnect');
 const { corsOption } = require(path.join(__dirname, 'config', 'corsOptions'));
 const upload = require('./middleware/multer');
 const isAuthenticated = require('./middleware/isAuthenticated');
+const {verifyJWT} = require('./middleware/verifyJWT');
+const {verifyRole} = require('./middleware/verifyRole');
 const { messageLimiter } = require('./Limiting/messageLimiter');
 const { contactLimiter } = require('./Limiting/contactLimiter');
 const { linksLimiter } = require('./Limiting/linksLimiter');
@@ -96,7 +98,7 @@ app.get('/user/:username', isAuthenticated, UserController.getUserByFullname);
 app.post('/users', isAuthenticated, UserController.createUser);
 app.put('/users/:id', isAuthenticated, upload.single('urlimage'), UserController.updateUserById);
 app.put('/usersE/:email', isAuthenticated, UserController.updateUserByEmail);
-app.delete('/users/:id', isAuthenticated, UserController.deleteUserById);
+app.delete('/users/:id',verifyJWT,verifyRole("admin"), UserController.deleteUserById);
 
 // Message routes
 app.get('/messages', isAuthenticated, MessageController.getMessages);
@@ -115,17 +117,19 @@ app.put('/links/:id', isAuthenticated,linksLimiter, LinksController.updateLink);
 app.delete('/links/:id', isAuthenticated, LinksController.deleteLink);
 
 // Contact Routes
-app.get('/contacts', isAuthenticated, ContacteController.getContacts);
+app.get('/contacts',verifyJWT,verifyRole("admin"), ContacteController.getContacts);
 app.get('/contacts/:id', isAuthenticated, ContacteController.getContactById);
 app.post('/contacts', isAuthenticated,contactLimiter,ContacteController.createContact);
 app.put('/contacts/:id', isAuthenticated, ContacteController.updateContactById);
-app.delete('/contacts/:id', isAuthenticated, ContacteController.deleteContactById);
+app.delete('/contacts/:id',verifyJWT,verifyRole("admin"), ContacteController.deleteContactById);
 
 // Admin Routes
-app.post('/register', isAuthenticated, AdmineController.registerAdmin);
-app.post('/login', isAuthenticated, AdmineController.loginAdmin);
-app.get('/admin', isAuthenticated, AdmineController.getAllAdmins);
-app.delete('/admin/:id', isAuthenticated, AdmineController.deleteAdminById);
+app.post('/register',AdmineController.registerAdmin);
+app.post('/login',AdmineController.loginAdmin);
+app.post('/refresh',AdmineController.refresh);
+app.post('/logout',AdmineController.logout);
+app.get('/admin',verifyJWT,verifyRole("admin"), AdmineController.getAllAdmins);
+app.delete('/admin/:id',verifyJWT,verifyRole("admin"),AdmineController.deleteAdminById);
 
 // Friends requests Routes
 app.post('/friend', isAuthenticated, friendRequestController.createFriendRequest);

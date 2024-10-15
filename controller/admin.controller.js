@@ -35,7 +35,7 @@ exports.registerAdmin = async (req, res) => {
     );
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
-      secure: false,  // true for https 
+      secure: true,  // true for https 
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -76,13 +76,11 @@ exports.loginAdmin = async (req, res) => {
     );
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
-      secure: false,  // true for https
+      secure: true,  // true for https
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    res.json({
-      accessToken,
-    });
+    res.json({accessToken});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -109,7 +107,7 @@ exports.refresh = (req, res) => {
     const accessToken = jwt.sign(
       { UserInfo: { id: foundUser._id, role: foundUser.role } },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "30m"}
+      { expiresIn: 60 * 10}
     );
     
     return res.json({ accessToken });
