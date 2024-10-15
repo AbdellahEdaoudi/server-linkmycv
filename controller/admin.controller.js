@@ -36,7 +36,7 @@ exports.registerAdmin = async (req, res) => {
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
       secure: true,  // true for https 
-      sameSite: "None",
+      sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.json({
