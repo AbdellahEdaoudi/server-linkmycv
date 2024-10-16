@@ -103,10 +103,10 @@ app.delete('/users/:id',verifyJWT,verifyRole("admin"), UserController.deleteUser
 // Message routes
 app.get('/messages', isAuthenticated, MessageController.getMessages);
 app.get('/messages/:id', isAuthenticated, MessageController.getMessageById);
-app.post('/messages',messageLimiter,MessageController.createMessage);
+app.post('/messages',isAuthenticated,messageLimiter,MessageController.createMessage);
 app.put('/messages/:id', isAuthenticated,messageLimiter,MessageController.updateMessageById);
 app.put('/readorno', isAuthenticated, MessageController.updateReadOrNoForMessages);
-app.delete('/messages/:id', MessageController.deleteMessageById);
+app.delete('/messages/:id', isAuthenticated, MessageController.deleteMessageById);
 app.delete('/messages_B_U', isAuthenticated, MessageController.deleteMessagesBetweenUsers);
 
 // Links route 
@@ -133,7 +133,7 @@ app.delete('/admin/:id',verifyJWT,verifyRole("admin"),AdmineController.deleteAdm
 
 // Friends requests Routes
 app.post('/friend', isAuthenticated, friendRequestController.createFriendRequest);
-app.get('/friend', friendRequestController.getAllFriendRequests);
+app.get('/friend', isAuthenticated, friendRequestController.getAllFriendRequests);
 app.get('/friend/:id', isAuthenticated, friendRequestController.getFriendRequestById);
 app.put('/friend/:id', isAuthenticated, friendRequestController.updateFriendRequest);
 app.delete('/friend/:id', isAuthenticated, friendRequestController.deleteFriendRequest);
