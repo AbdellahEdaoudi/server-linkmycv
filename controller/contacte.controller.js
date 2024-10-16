@@ -22,8 +22,14 @@ exports.getContactById = async (req, res) => {
 };
 
 exports.createContact = async (req, res) => {
+  const ContactData = req.body;
+  for (const key in ContactData) {
+    if (typeof ContactData[key] === 'string') {
+      ContactData[key] = sanitizeHtml(ContactData[key]);
+    }
+  }
   try {
-    const newContact = new Contacte(req.body);
+    const newContact = new Contacte(ContactData);
     const savedContact = await newContact.save();
     res.json(savedContact); // Status code 201 for resource creation
   } catch (error) {
