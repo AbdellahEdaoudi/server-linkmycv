@@ -3,7 +3,12 @@ const cloudinary = require("../utils/cloudinary");
 const sanitizeHtml = require('sanitize-html');
 
 
-
+const capitalizeWords = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\s+/g, ' ');
+};
 // Get all users
 const getUsers = async (req, res) => {
   try {
@@ -35,9 +40,13 @@ const createUser = async (req, res) => {
       userData[key] = sanitizeHtml(userData[key]);
     }
   }
+  if (userData.fullname) {
+    userData.fullname = capitalizeWords(userData.fullname);
+  }
   if (userData.username) {
     userData.username = userData.username.replace(/\s/g, '').toLowerCase();
   }
+
   try {
     // Check if the username already exists
     const existingUser = await User.findOne({ username: userData.username });
@@ -52,12 +61,6 @@ const createUser = async (req, res) => {
   }
 };
 
-const capitalizeWords = (str) => {
-  return str
-    .toLowerCase()
-    .replace(/\b\w/g, (char) => char.toUpperCase())
-    .replace(/\s+/g, ' ');
-};
 // Update user by ID
 const updateUserById = async (req, res) => {
    const { id } = req.params;
