@@ -27,10 +27,11 @@ const { contactLimiter } = require('./Limiting/contactLimiter');
 const { linksLimiter } = require('./Limiting/linksLimiter');
 const { requestsLimiter } = require('./Limiting/requestsLimiter');
 const cookiesParser = require("cookie-parser");
+const User = require('./models/User');
 
 
-// const Server_Url = "http://localhost:3000"
-const Server_Url = "https://linkerfolio.vercel.app"
+const Server_Url = "http://localhost:3000"
+// const Server_Url = "https://linkerfolio.vercel.app"
 
 
 // app.use(cors());
@@ -49,7 +50,21 @@ const io = socketIo(server, {
 
 // Socket.io
 io.on('connection', (socket) => {
-  console.log(`A user connected with id: ${socket.id}.`);
+  // console.log(`A user connected with id: ${socket.id}.`);
+
+  socket.on('userConnected', async (email) => {
+    if (email) {
+      socket.email = email;
+      try {
+        await User.findOneAndUpdate({ email }, { isOnline: true });
+        console.log(`User with email ${email} is online.`);
+      } catch (error) {
+        console.error(`Error updating user status: ${error.message}`);
+      }
+    } else {
+      console.error('Email is undefined, cannot update user status.');
+    }
+  });
 
   // Messages
   socket.on('sendMessage', (data) => {
@@ -78,6 +93,17 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('A user disconnected');
+  });
+
+  socket.on('disconnect', async () => {
+    if (socket.email) {
+      try {
+        await User.findOneAndUpdate({ email: socket.email }, { isOnline: false });
+        console.log(`User with email ${socket.email} is offline.`);
+      } catch (error) {
+        console.error(`Error updating user status: ${error.message}`);
+      }
+    }
   });
 
 });
