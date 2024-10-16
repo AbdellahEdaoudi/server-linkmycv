@@ -1,3 +1,4 @@
+const FriendRequest = require('../models/FriendRequest');
 const Messages = require('../models/Messages');
 
 // Get all messages
@@ -27,9 +28,27 @@ exports.getMessageById = async (req, res) => {
 // Create a new message
 exports.createMessage = async (req, res) => {
   const messageData = req.body;
+  const { from, to } = messageData;
+
   try {
+    // إذا كان from هو نفسه to، يمكن إرسال الرسالة
+    if (from === to) {
+      const newMessage = await Messages.create(messageData);
+      return res.status(201).json(newMessage);
+    }
+
+    // تحقق من حالة طلب الصداقة بين from و to
+    const friendshipStatus = await FriendRequest.findOne({ from, to });
+
+    // إذا لم يكن هناك طلب صداقة أو حالة الطلب ليست 'accept'
+    if (!friendshipStatus || friendshipStatus.status !== 'accept') {
+      return res.status(400).json({ error: 'Cannot send message unless the friend request is accepted.' });
+    }
+
+    // إذا كانت حالة الصداقة "accept"، يتم إنشاء الرسالة
     const newMessage = await Messages.create(messageData);
     res.status(201).json(newMessage);
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
