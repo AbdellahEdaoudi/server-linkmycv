@@ -1,4 +1,5 @@
 const Contacte = require("../models/Contacte");
+const sanitizeHtml = require('sanitize-html');
 
 exports.getContacts = async (req, res) => {
   try {
