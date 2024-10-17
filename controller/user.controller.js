@@ -56,6 +56,9 @@ const createUser = async (req, res) => {
     userData.fullname = capitalizeWords(userData.fullname);
   }
   if (userData.username) {
+    if (userData.username.length > 20) {
+      userData.username = userData.username.substring(0, 20);
+    }
     userData.username = userData.username.replace(/\s/g, '').toLowerCase();
   }
 
@@ -97,6 +100,9 @@ const updateUserById = async (req, res) => {
     userData.fullname = capitalizeWords(userData.fullname);
   }
   if (userData.username) {
+    if (userData.username.length > 20) {
+      userData.username = userData.username.substring(0, 20);
+    }
     userData.username = userData.username.replace(/\s/g, '').toLowerCase();
   }
 
@@ -107,8 +113,6 @@ const updateUserById = async (req, res) => {
         return res.status(400).json({ error: 'Username already exists' });
       }
     }
-
-    // تحقق مما إذا كان هناك ملف لرفعه
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
       userData.urlimage = result.secure_url;
