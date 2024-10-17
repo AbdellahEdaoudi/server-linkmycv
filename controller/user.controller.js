@@ -41,6 +41,18 @@ const createUser = async (req, res) => {
     }
   }
   if (userData.fullname) {
+    const words = userData.fullname.trim().split(/\s+/);
+    if (words.length > 2) {
+      userData.fullname = words.slice(0,2).join(' ');
+    } else {
+      userData.fullname = words.join(' ');
+    }
+    if (userData.fullname.length > 20) {
+      userData.fullname = userData.fullname.substring(0, 20);
+    }
+    userData.fullname = capitalizeWords(userData.fullname);
+  }
+  if (userData.fullname) {
     userData.fullname = capitalizeWords(userData.fullname);
   }
   if (userData.username) {
@@ -48,7 +60,6 @@ const createUser = async (req, res) => {
   }
 
   try {
-    // Check if the username already exists
     const existingUser = await User.findOne({ username: userData.username });
     if (existingUser) {
       return res.status(400).json({ error: 'Username already exists' });
@@ -63,25 +74,33 @@ const createUser = async (req, res) => {
 
 // Update user by ID
 const updateUserById = async (req, res) => {
-   const { id } = req.params;
-   const userData = req.body;
-   
-   if ('email' in userData) {
+  const { id } = req.params;
+  const userData = req.body;
+  if ('email' in userData) {
     delete userData.email;
   }
-   for (const key in userData) {
+  for (const key in userData) {
     if (typeof userData[key] === 'string') {
       userData[key] = sanitizeHtml(userData[key]);
     }
   }
-   if (userData.fullname) {
-     userData.fullname = capitalizeWords(userData.fullname);
-   }
-   if (userData.username) {
-     userData.username = userData.username.replace(/\s/g, '').toLowerCase();
-   }
+  if (userData.fullname) {
+    const words = userData.fullname.trim().split(/\s+/);
+    if (words.length > 2) {
+      userData.fullname = words.slice(0,2).join(' ');
+    } else {
+      userData.fullname = words.join(' ');
+    }
+    if (userData.fullname.length > 20) {
+      userData.fullname = userData.fullname.substring(0, 20);
+    }
+    userData.fullname = capitalizeWords(userData.fullname);
+  }
+  if (userData.username) {
+    userData.username = userData.username.replace(/\s/g, '').toLowerCase();
+  }
+
   try {
-    // Check if the username already exists
     if (userData.username) {
       const existingUser = await User.findOne({ username: userData.username });
       if (existingUser && existingUser._id.toString() !== id) {
@@ -89,7 +108,7 @@ const updateUserById = async (req, res) => {
       }
     }
 
-    // Check if there's a file to upload
+    // تحقق مما إذا كان هناك ملف لرفعه
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
       userData.urlimage = result.secure_url;
