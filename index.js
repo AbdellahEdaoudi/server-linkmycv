@@ -30,8 +30,8 @@ const cookiesParser = require("cookie-parser");
 const User = require('./models/User');
 
 
-// const Server_Url = "http://localhost:3000"
-const Server_Url = "https://linkerfolio.vercel.app"
+const Server_Url = "http://localhost:3000"
+// const Server_Url = "https://linkerfolio.vercel.app"
 
 
 // app.use(cors());
@@ -118,6 +118,7 @@ app.use(cookiesParser())
 app.use(express.json());
 // User Routes
 app.get('/users', isAuthenticated, UserController.getUsers);
+app.post('/chat-users', isAuthenticated, UserController.getUsersWithLastMessage);
 app.get('/users/:id', isAuthenticated, UserController.getUserById);
 app.get('/usersE/:email', isAuthenticated, UserController.getUserByEmail);
 app.get('/user/:username', isAuthenticated, UserController.getUserByFullname);

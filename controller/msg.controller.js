@@ -86,15 +86,12 @@ exports.deleteMessageById = async (req, res) => {
 exports.updateReadOrNoForMessages = async (req, res) => {
   const { fromEmail, toEmail } = req.body;
   try {
-    const result = await Messages.updateMany(
+     await Messages.updateMany(
       { from: fromEmail, to: toEmail, readorno: false },
       { readorno: true },
       { new: true, runValidators: true }
     );
-    const updatedMessages = await Messages.find(
-      { from: fromEmail, to: toEmail }
-    );
-    res.status(200).json({ message: 'Messages updated successfully', result: updatedMessages });
+    res.status(200).json({ message: 'Messages updated successfully'});
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
