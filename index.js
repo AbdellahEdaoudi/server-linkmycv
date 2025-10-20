@@ -30,9 +30,7 @@ const cookiesParser = require("cookie-parser");
 const User = require('./models/User');
 
 
-const Server_Url = "http://localhost:3000"
-// const Server_Url = "https://linkerfolio.vercel.app"
-
+const Server_Url = process.env.Server_Url;
 
 // app.use(cors());
 // app.use(cors({
