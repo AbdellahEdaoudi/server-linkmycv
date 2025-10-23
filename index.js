@@ -11,7 +11,7 @@ const AdmineController = require("./controller/admin.controller")
 const friendRequestController = require("./controller/friends.controller")
 const deletesController = require("./controller/deletes.controller")
 const translateController = require("./controller/translate.controller")
-const emailController = require('./controller/emailController'); 
+const emailController = require('./controller/emailController');
 const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
@@ -127,6 +127,7 @@ app.delete('/users/:id',verifyJWT,verifyRole("admin"), UserController.deleteUser
 
 // Message routes
 app.get('/messages', isAuthenticated, MessageController.getMessages);
+app.get('/messages/:email', isAuthenticated, MessageController.getMyMessages);
 app.get('/messages/:id', isAuthenticated, MessageController.getMessageById);
 app.post('/messages',isAuthenticated,messageLimiter,MessageController.createMessage);
 app.put('/messages/:id', isAuthenticated,messageLimiter,MessageController.updateMessageById);

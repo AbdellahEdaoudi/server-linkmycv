@@ -9,6 +9,18 @@ exports.getMessages = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+}
+// getMyMessages
+exports.getMyMessages = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const messages = await Messages.find({
+      $or: [{ from: email }, { to: email }]
+    }).sort({ createdAt: 1 });
+    res.status(200).json(messages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 // Get message by ID
