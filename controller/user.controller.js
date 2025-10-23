@@ -1,5 +1,8 @@
 const User = require('../models/User');
 const Message = require('../models/Messages');
+const Contacte = require('../models/Contacte');
+const FriendRequest = require('../models/FriendRequest');
+const Links = require('../models/Links');
 const cloudinary = require("../utils/cloudinary");
 const sanitizeHtml = require('sanitize-html');
 
@@ -152,7 +155,7 @@ const deleteUserById = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     const userEmail = deletedUser.email;
-    await Contact.deleteMany({ iduser: id });
+    await Contacte.deleteMany({ iduser: id });
     await FriendRequest.deleteMany({ $or: [{ from: userEmail }, { to: userEmail }] });
     await Links.deleteMany({ useremail: userEmail });
     await Message.deleteMany({ $or: [{ from: userEmail }, { to: userEmail }] });
