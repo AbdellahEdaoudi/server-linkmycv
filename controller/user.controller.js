@@ -147,11 +147,16 @@ const updateUserByEmail = async (req, res) => {
 const deleteUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedUser = await User.findByIdAndDelete({_id:id});
+    const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ message: 'User deleted successfully' });
+    const userEmail = deletedUser.email;
+    await Contact.deleteMany({ iduser: id });
+    await FriendRequest.deleteMany({ $or: [{ from: userEmail }, { to: userEmail }] });
+    await Links.deleteMany({ useremail: userEmail });
+    await Message.deleteMany({ $or: [{ from: userEmail }, { to: userEmail }] });
+    res.json({ message: 'User and all associated data deleted successfully' });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
