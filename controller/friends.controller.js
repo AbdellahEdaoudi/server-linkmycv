@@ -18,7 +18,17 @@ exports.createFriendRequest = async (req, res) => {
 // Get all friend requests
 exports.getAllFriendRequests = async (req, res) => {
   try {
-    const friendRequests = await FriendRequest.find();
+    const EmailUser = req.params.email;
+    if (!EmailUser) {
+      return res.status(400).json({ success: false, error: 'Email parameter is required' });
+    }
+    const friendRequests = await FriendRequest.find({
+      $or: [
+        { from: EmailUser },
+        { to: EmailUser }
+      ]
+    });
+
     res.status(200).json({ success: true, data: friendRequests });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

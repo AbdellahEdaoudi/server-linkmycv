@@ -160,7 +160,7 @@ app.delete('/admin/:id',verifyJWT,verifyRole("admin"),AdmineController.deleteAdm
 
 // Friends requests Routes
 app.post('/friend', isAuthenticated, friendRequestController.createFriendRequest);
-app.get('/friend', isAuthenticated, friendRequestController.getAllFriendRequests);
+app.get('/friend/:email', isAuthenticated, friendRequestController.getAllFriendRequests);
 app.get('/friend/:id', isAuthenticated, friendRequestController.getFriendRequestById);
 app.put('/friend/:id', isAuthenticated, friendRequestController.updateFriendRequest);
 app.delete('/friend/:id', isAuthenticated, friendRequestController.deleteFriendRequest);
