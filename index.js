@@ -34,14 +34,14 @@ const CLIENT_URL = process.env.Server_Url;
 
 // app.use(cors());
 app.use(cors({
-  origin: [CLIENT_URL,"http://localhost:3000"],
+  origin: ["https://linkerfolio.vercel.app","http://localhost:3000"],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 }));
 
 const io = socketIo(server, {
   cors: {
-    origin: [CLIENT_URL,"http://localhost:3000"],
+    origin: ["https://linkerfolio.vercel.app","http://localhost:3000"],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   }
