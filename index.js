@@ -30,19 +30,20 @@ const cookiesParser = require("cookie-parser");
 const User = require('./models/User');
 
 
-const Server_Url = process.env.Server_Url;
+const CLIENT_URL = process.env.Server_Url;
 
 // app.use(cors());
-// app.use(cors({
-//   origin: CLIENT_URL,
-//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-//   credentials: true
-// }));
+app.use(cors({
+  origin: [CLIENT_URL,"https://linkerfolio.vercel.app"],
+  methods: ["GET", "POST"],
+  credentials: true,
+}));
 
 const io = socketIo(server, {
   cors: {
-    origin: Server_Url,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+    origin: CLIENT_URL,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
   }
 });
 
