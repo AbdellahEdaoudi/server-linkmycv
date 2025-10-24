@@ -75,9 +75,6 @@ io.on('connection', (socket) => {
   socket.on('deleteMessage', (id) => {
     io.emit('receiveDeletedMessage', id);
   });
-  socket.on('updateReadOrNo', (data) => {
-    io.emit('receiveReadOrNoUpdate', data);
-  });
 
   // friendRequest
   socket.on('sendFriendRequest', (data) => {
@@ -120,7 +117,7 @@ app.get('/users', isAuthenticated, UserController.getUsers);
 app.post('/chat-users', isAuthenticated, UserController.getUsersWithLastMessage);
 app.get('/users/:id', isAuthenticated, UserController.getUserById);
 app.get('/usersE/:email', isAuthenticated, UserController.getUserByEmail);
-app.get('/user/:username', isAuthenticated, UserController.getUserByFullname);
+app.get('/user/:username', isAuthenticated, UserController.getUserByUsername);
 app.post('/users', isAuthenticated, UserController.createUser);
 app.put('/users/:id', isAuthenticated, upload.single('urlimage'), UserController.updateUserById);
 app.put('/usersE/:email', isAuthenticated, UserController.updateUserByEmail);
@@ -172,7 +169,7 @@ app.delete("/dc",isAuthenticated,deletesController.deleteContacts)
 app.delete("/dm",isAuthenticated,deletesController.deleteMessages)
 app.delete("/df",isAuthenticated,deletesController.deleteFriendReq)
 // Translate Route
-app.post("/translate", isAuthenticated, translateController.translateCV)
+app.get("/user/:username/:lang", isAuthenticated, translateController.getUserByUsernameTranslated)
 // SEND EMAIL
 app.post('/SendEmail', emailController.sendEmail);
 app.post('/SendEmailAll', emailController.sendEmailAll);

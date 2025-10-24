@@ -182,15 +182,19 @@ const getUserByEmail = async (req, res) => {
 };
 
 // Get user by fullname
-const getUserByFullname = async (req, res) => {
-  const {username} = req.params;
-
+const getUserByUsername = async (req, res) => {
+  const { username } = req.params;
   try {
-    const user = await User.findOne({username});
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.status(200).json(user);
+    const links = await Links.find({ useremail: user.email });
+
+    res.status(200).json({
+      user,
+      links
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -288,7 +292,7 @@ module.exports = {
   createUser,
   updateUserById,
   deleteUserById,
-  getUserByFullname,
+  getUserByUsername,
   getUserByEmail,
   updateUserByEmail,
   getUsersWithLastMessage,
