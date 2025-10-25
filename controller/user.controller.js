@@ -165,16 +165,12 @@ const deleteUserById = async (req, res) => {
   }
 };
 const getUserByEmail = async (req, res) => {
-  const { email } = req.params; // Assuming email is passed as a parameter
-
+  const { email } = req.params;
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     res.json(user);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -200,89 +196,6 @@ const getUserByUsername = async (req, res) => {
   }
 };
 
-const getUsersWithLastMessage = async (req, res) => {
-  try {
-    const { emailUser } = req.body;
-
-    const usersWithLastMessage = await Message.aggregate([
-      {
-        $match: {
-          $or: [{ from: emailUser }, { to: emailUser }]
-        }
-      },
-      {
-        $sort: { createdAt: -1 } // الأحدث أولًا
-      },
-      {
-        $group: {
-          _id: {
-            $cond: [
-              { $eq: ["$from", emailUser] },
-              "$to",
-              "$from"
-            ]
-          },
-          lastMessage: { $first: "$$ROOT" },
-          allMessages: { $push: "$$ROOT" }
-        }
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "_id",
-          foreignField: "email",
-          as: "user"
-        }
-      },
-      { $unwind: "$user" },
-      {
-        $addFields: {
-          unreadCount: {
-            $size: {
-              $filter: {
-                input: "$allMessages",
-                as: "msg",
-                cond: {
-                  $and: [
-                    { $eq: ["$$msg.to", emailUser] },
-                    { $eq: ["$$msg.readorno", false] }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      },
-      {
-        $project: {
-          _id: 0,
-          fullname: "$user.fullname",
-          email: "$user.email",
-          username: "$user.username",
-          urlimage: "$user.urlimage",
-          unreadCount: 1,
-          lastMessage: {
-            from: "$lastMessage.from",
-            fromname: "$lastMessage.fromname",
-            fromimg: "$lastMessage.fromimg",
-            to: "$lastMessage.to",
-            toimg: "$lastMessage.toimg",
-            toname: "$lastMessage.toname",
-            message: "$lastMessage.message",
-            readorno: "$lastMessage.readorno",
-            createdAt: "$lastMessage.createdAt"
-          }
-        }
-      },
-      { $sort: { "lastMessage.createdAt": -1 } }
-    ]);
-
-    res.json(usersWithLastMessage);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 
 
 
@@ -295,5 +208,4 @@ module.exports = {
   getUserByUsername,
   getUserByEmail,
   updateUserByEmail,
-  getUsersWithLastMessage,
 };

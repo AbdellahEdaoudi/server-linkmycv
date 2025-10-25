@@ -1,9 +1,14 @@
 const FriendRequest = require('../models/FriendRequest'); 
+const User = require('../models/User');
 
 // Create a new friend request
 exports.createFriendRequest = async (req, res) => {
   try {
     const { from, to, status } = req.body;
+    const finduser = await User.findOne({ email: to });
+    if (!finduser) {
+      return res.status(404).json({ success: false, error: 'Recipient user not found' });
+    }
     if (!from || !to || !status) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }

@@ -11,6 +11,7 @@ const AdmineController = require("./controller/admin.controller")
 const friendRequestController = require("./controller/friends.controller")
 const deletesController = require("./controller/deletes.controller")
 const translateController = require("./controller/translate.controller")
+const generalController = require("./controller/general.controller");
 const emailController = require('./controller/emailController');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -28,6 +29,7 @@ const { linksLimiter } = require('./Limiting/linksLimiter');
 const { requestsLimiter } = require('./Limiting/requestsLimiter');
 const cookiesParser = require("cookie-parser");
 const User = require('./models/User');
+const { socketHandler } = require('./sockets/socket');
 
 
 const CLIENT_URL = process.env.Server_Url;
@@ -48,61 +50,7 @@ const io = socketIo(server, {
 });
 
 // Socket.io
-io.on('connection', (socket) => {
-  // console.log(`A user connected with id: ${socket.id}.`);
-
-  socket.on('userConnected', async (email) => {
-    if (email) {
-      socket.email = email;
-      try {
-        await User.findOneAndUpdate({ email }, { isOnline: true });
-        console.log(`User with email ${email} is online.`);
-      } catch (error) {
-        console.error(`Error updating user status: ${error.message}`);
-      }
-    } else {
-      console.error('Email is undefined, cannot update user status.');
-    }
-  });
-
-  // Messages
-  socket.on('sendMessage', (data) => {
-    io.emit('receiveMessage', data);
-  });
-  socket.on('updateMessage', (data) => {
-    io.emit('receiveUpdatedMessage', data);
-  });
-  socket.on('deleteMessage', (id) => {
-    io.emit('receiveDeletedMessage', id);
-  });
-
-  // friendRequest
-  socket.on('sendFriendRequest', (data) => {
-    io.emit('receiveFriendRequest', data);
-  });
-  socket.on('updateFriendRequest', (data) => {
-    io.emit('receiveUpdatedFriendRequest', data);
-  });
-  socket.on('deleteFriendRequest', (id) => {
-    io.emit('receiveDeletedFriendRequest', id);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
-  });
-
-  socket.on('disconnect', async () => {
-    if (socket.email) {
-      try {
-        await User.findOneAndUpdate({ email: socket.email }, { isOnline: false });
-        console.log(`User with email ${socket.email} is offline.`);
-      } catch (error) {
-        console.error(`Error updating user status: ${error.message}`);
-      }
-    }
-  });
-
-});
+socketHandler(io);
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -112,9 +60,9 @@ connectDB()
 app.use(cors(corsOption));
 app.use(cookiesParser())
 app.use(express.json());
+app.get("/alldata/:email", generalController.getAllData);
 // User Routes
 app.get('/users', isAuthenticated, UserController.getUsers);
-app.post('/chat-users', isAuthenticated, UserController.getUsersWithLastMessage);
 app.get('/users/:id', isAuthenticated, UserController.getUserById);
 app.get('/usersE/:email', isAuthenticated, UserController.getUserByEmail);
 app.get('/user/:username', isAuthenticated, UserController.getUserByUsername);
