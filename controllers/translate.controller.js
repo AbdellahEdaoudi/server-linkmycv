@@ -2,16 +2,6 @@ const translate = require('translate-google');
 const User = require('../models/User');
 const Links = require('../models/Links');
 
-const symbols = {
-  summary: "🔷",
-  services: "💼",
-  education: "🎓",
-  experience: "⭐",
-  skills: "💡",
-  languages: "🌍",
-  businessLinks : ""
-};
-
 const labelsToTranslate = {
   summary: "Summary",
   services: "Services",
@@ -66,13 +56,8 @@ exports.getUserByUsernameTranslated = async (req, res) => {
     const translatedLabels = await translate(labelsToTranslate, { to: lang });
     const finalLabels = {};
     for (const key in translatedLabels) {
-      if (lang === "ar") {
-        finalLabels[key] = `${symbols[key]} ${translatedLabels[key]}`; // الرمز قبل النص
-      } else {
-        finalLabels[key] = `${translatedLabels[key]} ${symbols[key]}`; // الرمز بعد النص
-      }
+      finalLabels[key] = translatedLabels[key];
     }
-
 
     res.status(200).json({
       user: translatedUser,
