@@ -132,20 +132,6 @@ const updateUserById = async (req, res) => {
   }
 };
 
-const updateUserByEmail = async (req, res) => {
-  const { email } = req.params;
-  const userData = req.body;
-
-  try {
-    const updatedUser = await User.findOneAndUpdate({ email }, userData, { new: true });
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    res.json(updatedUser);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
 // Delete user by ID
 const deleteUserById = async (req, res) => {
   const { id } = req.params;
@@ -164,6 +150,7 @@ const deleteUserById = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 const getUserByEmail = async (req, res) => {
   const { email } = req.params;
   try {
@@ -207,5 +194,4 @@ module.exports = {
   deleteUserById,
   getUserByUsername,
   getUserByEmail,
-  updateUserByEmail,
 };
