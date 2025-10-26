@@ -4,15 +4,15 @@ const User = require('../models/User');
 // Create a new friend request
 exports.createFriendRequest = async (req, res) => {
   try {
-    const { from, to, status } = req.body;
+    const { from, to } = req.body;
     const finduser = await User.findOne({ email: to });
     if (!finduser) {
       return res.status(404).json({ success: false, error: 'Recipient user not found' });
     }
-    if (!from || !to || !status) {
+    if (!from || !to) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
-    const newRequest = new FriendRequest({ from, to, status });
+    const newRequest = new FriendRequest({ from, to, status: "pending" });
     await newRequest.save();
     res.status(201).json({ success: true, data: newRequest });
   } catch (error) {
@@ -58,8 +58,7 @@ exports.getFriendRequestById = async (req, res) => {
 exports.updateFriendRequest = async (req, res) => {
   try {
     const { id } = req.params;
-    const { from, to, status } = req.body;
-    const updatedRequest = await FriendRequest.findByIdAndUpdate(id, { from, to, status }, { new: true });
+    const updatedRequest = await FriendRequest.findByIdAndUpdate(id, {status:"accept"}, { new: true });
     if (!updatedRequest) {
       return res.status(404).json({ success: false, message: 'Friend request not found' });
     }
@@ -69,7 +68,6 @@ exports.updateFriendRequest = async (req, res) => {
   }
 };
 
-
 // Delete a friend request
 exports.deleteFriendRequest = async (req, res) => {
   try {
@@ -78,7 +76,12 @@ exports.deleteFriendRequest = async (req, res) => {
     if (!deletedRequest) {
       return res.status(404).json({ success: false, message: 'Friend request not found' });
     }
-    res.status(200).json({ success: true, message: 'Friend request deleted successfully' });
+    res.status(200).json({ 
+      success: true, 
+      message: 'Friend request deleted successfully',
+      requestTo:deletedRequest.to,
+      requestFrom: deletedRequest.from
+   });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
