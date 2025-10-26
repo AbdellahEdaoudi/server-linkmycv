@@ -12,6 +12,16 @@ exports.createFriendRequest = async (req, res) => {
     if (!from || !to) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
+    const existingRequest = await FriendRequest.findOne({
+      $or: [
+        { from, to },
+        { from: to, to: from }
+      ]
+    });
+
+    if (existingRequest) {
+      return res.status(400).json({ success: false, error: 'Friend request already exists' });
+    }
     const newRequest = new FriendRequest({ from, to, status: "pending" });
     await newRequest.save();
     res.status(201).json({ success: true, data: newRequest });
