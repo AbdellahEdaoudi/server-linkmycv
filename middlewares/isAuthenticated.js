@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
    if (!token) {
      return res.status(401).json({ message: 'Token is missing' });
    }
-   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+   jwt.verify(token, process.env.NEXTAUTH_SECRET, (err, user) => {
      if (err) {
        console.error('Authentication error:', err);
        return res.status(401).json({ message: 'Invalid token' });

@@ -2,20 +2,15 @@ const Links = require('../models/Links');
 
 
 
-// Get all links
-const getAllLinks = async (req, res) => {
-  try {
-    const links = await Links.find();
-    res.json(links); // Default status code is 200
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching links', error: error.message });
-  }
-};
-
 // Get a single link by ID
-const getLinkById = async (req, res) => {
+const getLinkByEmail = async (req, res) => {
+  const {email} = req.params;
+  const reqemail = req.user?.email;
+  if (email !== reqemail) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
   try {
-    const link = await Links.findById(req.params.id);
+    const link = await Links.finfOne({ userEmail: email });
     if (!link) {
       return res.status(404).json({ message: 'Link not found' });
     }
@@ -27,6 +22,10 @@ const getLinkById = async (req, res) => {
 
 // Create a new link
 const createLink = async (req, res) => {
+  const reqemail = req.user?.email;
+  if (req.body.useremail !== reqemail) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
   try {
     const newLink = new Links(req.body);
     await newLink.save();
@@ -38,6 +37,10 @@ const createLink = async (req, res) => {
 
 // Update a link by ID
 const updateLink = async (req, res) => {
+  const reqemail = req.user?.email;
+  if (req.body.useremail !== reqemail) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
   try {
     const updatedLink = await Links.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedLink) {
@@ -51,6 +54,11 @@ const updateLink = async (req, res) => {
 
 // Delete a link by ID
 const deleteLink = async (req, res) => {
+  const reqemail = req.user?.email;
+  const linkToDelete = await Links.findById(req.params.id);
+  if (linkToDelete.useremail !== reqemail) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
   try {
     const deletedLink = await Links.findByIdAndDelete(req.params.id);
     if (!deletedLink) {
@@ -65,8 +73,7 @@ const deleteLink = async (req, res) => {
 // Export functions
 module.exports = {
   createLink,
-  getAllLinks,
-  getLinkById,
+  getLinkByEmail,
   updateLink,
   deleteLink
 };

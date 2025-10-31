@@ -24,6 +24,9 @@ exports.getContactById = async (req, res) => {
 
 exports.createContact = async (req, res) => {
   const ContactData = req.body;
+  if (ContactData.email !== req.user?.email) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
   for (const key in ContactData) {
     if (typeof ContactData[key] === 'string') {
       ContactData[key] = sanitizeHtml(ContactData[key]);

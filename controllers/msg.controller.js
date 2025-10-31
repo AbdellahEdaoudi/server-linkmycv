@@ -88,7 +88,7 @@ exports.deleteMessageById = async (req, res) => {
     if (!deletedMessage) {
       return res.status(404).json({ message: 'Message not found' });
     }
-    res.json({ message: 'Message deleted successfully' });
+    res.json(deletedMessage);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -97,6 +97,10 @@ exports.deleteMessageById = async (req, res) => {
 
 exports.updateReadOrNoForMessages = async (req, res) => {
   const { fromEmail, toEmail } = req.body;
+  const reqemail = req.user?.email;
+  if (toEmail !== reqemail) {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
   try {
      await Messages.updateMany(
       { from: fromEmail, to: toEmail, readorno: false },
@@ -106,31 +110,5 @@ exports.updateReadOrNoForMessages = async (req, res) => {
     res.status(200).json({ message: 'Messages updated successfully'});
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
-  }
-};
-
-
-// Delete messages between two users if they exist
-exports.deleteMessagesBetweenUsers = async (req, res) => {
-  try {
-    const { Emailuser, FriendReq } = req.body;
-    const messagesExist = await Messages.findOne({
-      $or: [
-        { from: Emailuser, to: FriendReq },
-        { from: FriendReq, to: Emailuser }
-      ]
-    });
-    if (!messagesExist) {
-      return res.status(404).json({ success: false, message: 'No messages found between these users' });
-    }
-    const deleteMessages = await Messages.deleteMany({
-      $or: [
-        { from: Emailuser, to: FriendReq },
-        { from: FriendReq, to: Emailuser }
-      ]
-    });
-    res.status(200).json({ success: true, message: 'Messages between users deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
 };

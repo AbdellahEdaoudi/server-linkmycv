@@ -9,11 +9,10 @@ const upload = require('../middlewares/multer');
 
 // User Routes
 app.get('/', isAuthenticated, UserController.getUsers);
-app.get('/:id', isAuthenticated, UserController.getUserById);
 app.get('/email/:email', isAuthenticated, UserController.getUserByEmail);
 app.get('/username/:username', isAuthenticated, UserController.getUserByUsername);
 app.post('/', isAuthenticated, UserController.createUser);
-app.put('/:id', isAuthenticated, upload.single('urlimage'), UserController.updateUserById);
+app.put('/:email',isAuthenticated,upload.single('urlimage'), UserController.updateUserByEmail); 
 app.delete('/:id', verifyJWT, verifyRole("admin"), UserController.deleteUserById);
 // Translate Route
 app.get("/:username/:lang", isAuthenticated, translateController.getUserByUsernameTranslated)

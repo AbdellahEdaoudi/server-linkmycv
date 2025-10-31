@@ -13,6 +13,7 @@ const { connectDB } = require('./config/dbConnect');
 const { corsOption } = require(path.join(__dirname, 'config', 'corsOptions'));
 const cookiesParser = require("cookie-parser");
 const { socketHandler } = require('./sockets/socket');
+const isAuthenticated = require('./middlewares/isAuthenticated');
 const CLIENT_URL = process.env.Server_Url;
 
 
@@ -44,7 +45,7 @@ app.use(cookiesParser())
 app.use(express.json());
 
 // General Route
-app.get("/alldata/:email", generalController.getAllData);
+app.get("/alldata/:email",isAuthenticated,generalController.getAllData);
 app.use('/users', require('./routes/userRoutes'));
 app.use('/messages', require('./routes/messageRoutes'));
 app.use('/friends', require('./routes/friendsRoutes'));

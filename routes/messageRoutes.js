@@ -10,8 +10,7 @@ app.get('/email/:email', isAuthenticated, MessageController.getMyMessages);
 app.get('/:id', isAuthenticated, MessageController.getMessageById);
 app.post('/',isAuthenticated,messageLimiter,MessageController.createMessage);
 app.put('/:id', isAuthenticated,messageLimiter,MessageController.updateMessageById);
-app.put('/readorno', isAuthenticated, MessageController.updateReadOrNoForMessages);
+app.put('/msg/readorno', isAuthenticated, MessageController.updateReadOrNoForMessages); 
 app.delete('/:id', isAuthenticated, MessageController.deleteMessageById);
-app.delete('/messages/dlmbusers', isAuthenticated, MessageController.deleteMessagesBetweenUsers);
 
 module.exports = app;
