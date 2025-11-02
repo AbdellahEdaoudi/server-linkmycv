@@ -17,7 +17,7 @@ exports.getAllData = async (req, res) => {
         }
         const [users, messages, friendRequests , links] = await Promise.all([
           User.find().collation({ locale: "en", strength: 1 }).sort({ fullname: 1 })
-          .select("fullname email username phoneNumber urlimage category").lean(),
+          .select(" _id fullname email username phoneNumber urlimage category createdAt").lean(),
           Messages.find({
             $or: [{ from: email }, { to: email }],
           }).sort({ createdAt: 1 }).select("-__v").lean(),

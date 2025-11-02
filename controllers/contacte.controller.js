@@ -2,6 +2,10 @@ const Contacte = require("../models/Contacte");
 const sanitizeHtml = require('sanitize-html');
 
 exports.getContacts = async (req, res) => {
+  const reqemail = req.user?.email;
+  if (reqemail !== "abdellahedaoudi80@gmail.com"){
+    return  res.status(403).json({ message: 'Forbidden' });
+  }
   try {
     const contacts = await Contacte.find();
     res.json(contacts); // Default status code is 200
@@ -11,6 +15,10 @@ exports.getContacts = async (req, res) => {
 };
 
 exports.getContactById = async (req, res) => {
+  const reqemail = req.user?.email;
+  if (reqemail !== "abdellahedaoudi80@gmail.com"){
+    return  res.status(403).json({ message: 'Forbidden' });
+  }
   try {
     const contact = await Contacte.findById(req.params.id);
     if (!contact) {
@@ -54,6 +62,10 @@ exports.updateContactById = async (req, res) => {
 };
 
 exports.deleteContactById = async (req, res) => {
+  const reqemail = req.user?.email;
+  if (reqemail !== "abdellahedaoudi80@gmail.com"){
+    return  res.status(403).json({ message: 'Forbidden' });
+  }
   try {
     const deletedContact = await Contacte.findByIdAndDelete(req.params.id);
     if (!deletedContact) {

@@ -13,7 +13,7 @@ app.get('/email/:email', isAuthenticated, UserController.getUserByEmail);
 app.get('/username/:username', isAuthenticated, UserController.getUserByUsername);
 app.post('/', isAuthenticated, UserController.createUser);
 app.put('/:email',isAuthenticated,upload.single('urlimage'), UserController.updateUserByEmail); 
-app.delete('/:id', verifyJWT, verifyRole("admin"), UserController.deleteUserById);
+app.delete('/:id',isAuthenticated, UserController.deleteUserById);
 // Translate Route
 app.get("/:username/:lang", isAuthenticated, translateController.getUserByUsernameTranslated)
 
