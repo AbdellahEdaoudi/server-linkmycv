@@ -1,6 +1,28 @@
-const translate = require('translate-google');
+const gTranslate = require('google-translate-api-x');
 const User = require('../models/User');
 const Links = require('../models/Links');
+
+async function translate(input, options) {
+  if (typeof input === 'string') {
+    const res = await gTranslate(input, options);
+    return res.text;
+  }
+  if (Array.isArray(input)) {
+    const res = await gTranslate(input, options);
+    return res.map(r => r.text);
+  }
+  if (typeof input === 'object' && input !== null) {
+    const keys = Object.keys(input);
+    const values = keys.map(k => input[k]);
+    const res = await gTranslate(values, options);
+    const translatedObj = {};
+    keys.forEach((k, idx) => {
+      translatedObj[k] = res[idx].text;
+    });
+    return translatedObj;
+  }
+  return input;
+}
 
 const labelsToTranslate = {
   summary: "Summary",
