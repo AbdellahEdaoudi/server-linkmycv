@@ -61,7 +61,7 @@ app.use("/", express.static(path.join(__dirname, "public")));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, "./Views/index.html"))
 })
-app.all("*", (req, res) => {
+app.all("(.*)", (req, res) => {
   res.status(404);
   if (req.accepts("html")) {
     res.sendFile(path.join(__dirname, "Views", "404.html"));
