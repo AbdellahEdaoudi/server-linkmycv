@@ -1,8 +1,7 @@
-const User = require('../models/User');
-const Message = require('../models/Messages');
-const Contacte = require('../models/Contacte');
-const FriendRequest = require('../models/FriendRequest');
-const Links = require('../models/Links');
+const User = require('../models/user.model');
+const Message = require('../models/message.model');
+const Contacte = require('../models/contact.model');
+const FriendRequest = require('../models/friend-request.model');
 const cloudinary = require("../utils/cloudinary");
 const sanitizeHtml = require('sanitize-html');
 
@@ -131,9 +130,8 @@ const deleteUserById = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     const userEmail = deletedUser.email;
-    await Contacte.deleteMany({ iduser: id });
-    await FriendRequest.deleteMany({ $or: [{ from: userEmail }, { to: userEmail }] });
-    await Links.deleteMany({ useremail: userEmail });
+    await Contacte.deleteMany({ user: id });
+    await FriendRequest.deleteMany({ $or: [{ sender: id }, { receiver: id }] });
     await Message.deleteMany({ $or: [{ from: userEmail }, { to: userEmail }] });
     res.json({ message: 'User and all associated data deleted successfully' });
   } catch (error) {
@@ -148,7 +146,7 @@ const getUserByEmail = async (req, res) => {
     return res.status(403).json({ message: 'Forbidden' });
   }
   try {
-    const user = await User.findOne({ email }).select('-aboni -blocked -updatedAt -createdAt -__v').lean();
+    const user = await User.findOne({ email }).select('-updatedAt -createdAt -__v').lean();
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

@@ -1,5 +1,5 @@
-const FriendRequest = require('../models/FriendRequest');
-const Messages = require('../models/Messages');
+const FriendRequest = require('../models/friend-request.model');
+const Messages = require('../models/message.model');
 
 // Get all messages
 exports.getMessages = async (req, res) => {

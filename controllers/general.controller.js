@@ -1,8 +1,7 @@
 // controller/general.controller.js
-const User = require("../models/User");
-const Messages = require("../models/Messages");
-const FriendRequest = require("../models/FriendRequest");
-const Links = require("../models/Links");
+const User = require("../models/user.model");
+const Messages = require("../models/message.model");
+const FriendRequest = require("../models/friend-request.model");
 
 exports.getAllData = async (req, res) => {
   try {
@@ -15,23 +14,22 @@ exports.getAllData = async (req, res) => {
         if (!email || !findemail) {
           return res.status(400).json({ success: false, message: "Email is required" });
         }
-        const [users, messages, friendRequests , links] = await Promise.all([
+        const [users, messages, friendRequests] = await Promise.all([
           User.find().collation({ locale: "en", strength: 1 }).sort({ fullname: 1 })
-          .select(" _id fullname email username phoneNumber urlimage category createdAt").lean(),
+          .select(" _id fullname email username phoneNumber urlimage specialization category createdAt").lean(),
           Messages.find({
             $or: [{ from: email }, { to: email }],
           }).sort({ createdAt: 1 }).select("-__v").lean(),
           FriendRequest.find({
             $or: [{ from: email }, { to: email }],
           }).select("-createdAt -updatedAt -__v").lean(),
-          Links.find({ userEmail: email }).select("-createdAt -updatedAt -__v").lean(),
         ]);
         res.status(200).json({
           success: true,
           users,
           messages,
           friends: friendRequests,
-          links,
+          links: findemail.customLinks || [],
         });
         } catch (error) {
           res.status(500).json({ success: false, error: error.message });

@@ -1,6 +1,9 @@
 {
-  "name": "server",
+  "name": "linkerfolio-server",
   "version": "1.0.0",
+  "engines": {
+    "node": "24.x"
+  },
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",

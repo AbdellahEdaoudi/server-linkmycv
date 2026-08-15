@@ -1,9 +1,18 @@
+const verifyRole = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req?.user?.role) {
+            return res.status(403).json({
+                message: "No role found"
+            });
+        }
 
-exports.verifyRole = (role) => {
-  return (req, res, next) => {
-    if (req.user.UserInfo.role !== role) {
-      return res.status(401).json({ message: "Not allowed" });
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({
+                message: "Insufficient permissions"
+            });
+        }
+        next();
     }
-    next();
-  };
-};
+}
+
+module.exports = { verifyRole };

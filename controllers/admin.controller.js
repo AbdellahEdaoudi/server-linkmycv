@@ -1,25 +1,27 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin'); // Adjust the path as necessary
+const User = require('../models/user.model');
 
 // Register Function
 exports.registerAdmin = async (req, res) => {
-  const {email, password } = req.body;
+  const {email, password, fullname } = req.body;
   
   if (!email || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const foundUser = await Admin.findOne({ email }).exec();
+    const foundUser = await User.findOne({ email }).exec();
     if (foundUser) {
       return res.status(401).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new Admin({
+    const user = new User({
+      fullname: fullname || email.split('@')[0],
       email,
-      password: hashedPassword, // Changed from 'pass' to 'password'
+      password: hashedPassword,
+      role: "admin",
     });
 
     await user.save();
@@ -56,18 +58,22 @@ exports.loginAdmin = async (req, res) => {
   }
 
   try {
-    const foundUser = await Admin.findOne({ email }).exec();
+    const foundUser = await User.findOne({ email }).select('+password').exec();
     if (!foundUser) {
       return res.status(401).json({ message: "User does not exist" });
     }
 
-    const match = await bcrypt.compare(password, foundUser.password); // Changed from 'pass' to 'password'
+    if (foundUser.role !== 'admin') {
+      return res.status(403).json({ message: "Access forbidden: Not an admin" });
+    }
+
+    const match = await bcrypt.compare(password, foundUser.password);
     if (!match) return res.status(401).json({ message: "Wrong Password" });
 
     const accessToken = jwt.sign(
       { UserInfo: { id: foundUser._id, role: foundUser.role } },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn:15}
+      { expiresIn: 15 }
     );
     const refreshToken = jwt.sign(
       { UserInfo: { id: foundUser._id, role: foundUser.role } },
@@ -99,8 +105,8 @@ exports.refresh = (req, res) => {
       return res.status(403).json({ message: 'Forbidden' });
     }
     
-    const foundUser = await Admin.findById(user.UserInfo.id).exec();
-    if (!foundUser) {
+    const foundUser = await User.findById(user.UserInfo.id).exec();
+    if (!foundUser || foundUser.role !== 'admin') {
       return res.status(401).json({ message: 'Unauthorized' });
     }
     
@@ -128,7 +134,7 @@ exports.logout = (req, res) => {
 
 exports.getAllAdmins = async (req, res) => {
   try {
-    const admins = await Admin.find().exec();
+    const admins = await User.find({ role: 'admin' }).exec();
     res.json(admins);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -137,13 +143,13 @@ exports.getAllAdmins = async (req, res) => {
 exports.deleteAdminById = async (req, res) => {
   try {
     const { id } = req.params;
-    const admin = await Admin.findByIdAndDelete({_id:id}).exec();
+    const admin = await User.findByIdAndUpdate(id, { role: 'user' }).exec();
 
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    res.json({ message: "Admin deleted successfully" });
+    res.json({ message: "Admin role revoked successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -46,12 +46,11 @@ app.use(express.json());
 
 // General Route
 app.get("/alldata/:email",isAuthenticated,generalController.getAllData);
-app.use('/users', require('./routes/userRoutes'));
-app.use('/messages', require('./routes/messageRoutes'));
-app.use('/friends', require('./routes/friendsRoutes'));
-app.use('/links', require('./routes/linksRoutes'));
-app.use('/contacts', require('./routes/contactsRoutes'));
-app.use('/', require('./routes/adminRoutes'));
+app.use('/users', require('./routes/user.routes'));
+app.use('/messages', require('./routes/message.routes'));
+app.use('/friends', require('./routes/friend.routes'));
+app.use('/contacts', require('./routes/contact.routes'));
+app.use('/', require('./routes/admin.routes'));
 // SEND EMAIL
 app.post('/SendEmail', emailController.sendEmail);
 app.post('/SendEmailAll', emailController.sendEmailAll);
