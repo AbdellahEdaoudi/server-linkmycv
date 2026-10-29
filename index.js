@@ -17,7 +17,7 @@ app.use(cookiesParser());
 app.use(express.json());
 
 // ─── Database ─────────────────────────────────────────────────────────────────
-connectDB();
+connectDB().catch(console.error);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth',     require('./routes/auth.routes'));
