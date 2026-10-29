@@ -10,12 +10,10 @@ const UserSchema = new mongoose.Schema({
   },
   email: { 
     type: String, 
-    required: [true, 'Email is required'], 
-    unique: true, 
     trim: true, 
     lowercase: true,
-    index: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email address']
+    maxlength: [100, 'Email cannot exceed 100 characters'],
+    default: ""
   },
   username: { 
     type: String, 
@@ -28,14 +26,21 @@ const UserSchema = new mongoose.Schema({
   },
   phoneNumber: { 
     type: String, 
-    trim: true 
+    trim: true,
+    maxlength: [25, 'Phone number cannot exceed 25 characters']
   },
   country: { 
     type: String, 
-    trim: true 
+    trim: true,
+    maxlength: [60, 'Location cannot exceed 60 characters']
   },
   profileImage: { 
     type: String, 
+    trim: true,
+    default: ""
+  },
+  cloudinaryPublicId: {
+    type: String,
     trim: true,
     default: ""
   },
@@ -62,43 +67,87 @@ const UserSchema = new mongoose.Schema({
 
   // Professional Profile Details (Structured Sub-schemas)
   educations: [{
-    institution: { type: String, trim: true },      // e.g. Harvard University
-    degree: { type: String, trim: true },           // e.g. Bachelor of Science
-    fieldOfStudy: { type: String, trim: true },     // e.g. Software Engineering
+    institution: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Institution cannot exceed 100 characters']
+    },
+    degree: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Degree cannot exceed 100 characters']
+    },
+    fieldOfStudy: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Field of study cannot exceed 100 characters']
+    },
     startDate: { type: Date },
     endDate: { type: Date },
     current: { type: Boolean, default: false },
-    description: { type: String, trim: true }
+    description: { 
+      type: String, 
+      trim: true,
+      maxlength: [1000, 'Description cannot exceed 1000 characters']
+    }
   }],
 
   experiences: [{
-    company: { type: String, trim: true },
-    position: { type: String, trim: true },
-    location: { type: String, trim: true },
+    company: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Company cannot exceed 100 characters']
+    },
+    position: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Position cannot exceed 100 characters']
+    },
+    location: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Location cannot exceed 100 characters']
+    },
     startDate: { type: Date },
     endDate: { type: Date },
     current: { type: Boolean, default: false },
-    description: { type: String, trim: true }
+    description: { 
+      type: String, 
+      trim: true,
+      maxlength: [1000, 'Description cannot exceed 1000 characters']
+    }
   }],
 
   skillsList: [{
-    name: { type: String, trim: true },
-    level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'], default: 'Intermediate' }
+    name: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Skill name cannot exceed 100 characters']
+    }
   }],
 
   languagesList: [{
-    language: { type: String, trim: true },
-    proficiency: { type: String, enum: ['Basic', 'Conversational', 'Fluent', 'Native'], default: 'Fluent' }
-  }],
-
-  servicesList: [{
-    title: { type: String, trim: true },
-    description: { type: String, trim: true }
+    language: { 
+      type: String, 
+      trim: true,
+      maxlength: [100, 'Language name cannot exceed 100 characters']
+    }
   }],
 
   // Professional Social & Portfolio Links
   socials: {
-    github: { type: String, trim: true, default: "" }
+    github: { 
+      type: String, 
+      trim: true, 
+      default: "",
+      maxlength: [200, 'GitHub URL cannot exceed 200 characters']
+    },
+    linkedin: { 
+      type: String, 
+      trim: true, 
+      default: "",
+      maxlength: [200, 'LinkedIn URL cannot exceed 200 characters']
+    }
   },
 
   // Account Status & Permissions

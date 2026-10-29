@@ -1,21 +1,37 @@
-const express = require("express");
-const app = express();
-const UserController = require("../controllers/user.controller");
-const translateController = require("../controllers/translate.controller");
-const isAuthenticated = require('../middlewares/isAuthenticated');
-const {verifyJWT} = require('../middlewares/verifyJWT');
-const {verifyRole} = require('../middlewares/verifyRole');
-const upload = require('../middlewares/multer');
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/user.controller');
+const { verifyJWT } = require('../middlewares/verifyJWT');
 
-// User Routes
-app.get('/', isAuthenticated, UserController.getUsers);
-app.get('/email/:email', isAuthenticated, UserController.getUserByEmail);
-app.get('/username/:username', isAuthenticated, UserController.getUserByUsername);
-app.post('/', isAuthenticated, UserController.createUser);
-app.put('/:email',isAuthenticated,upload.single('urlimage'), UserController.updateUserByEmail); 
-app.delete('/:id',isAuthenticated, UserController.deleteUserById);
-// Translate Route
-app.get("/:username/:lang", isAuthenticated, translateController.getUserByUsernameTranslated)
+// ── Public Route (no auth required) ──
+router.get('/:username', userController.getUserByUsername);
 
+// ── Protected Routes (JWT required) ──
+const protectedRouter = express.Router();
+protectedRouter.use(verifyJWT);
 
-module.exports = app;
+// Profile & Avatar
+protectedRouter.put('/profile', userController.updateBasicProfile);
+protectedRouter.put('/avatar',  userController.uploadAvatarMiddleware, userController.updateAvatar);
+
+// Experience CRUD
+protectedRouter.post('/experiences',      userController.addExperience);
+protectedRouter.put('/experiences/:id',   userController.updateExperience);
+protectedRouter.delete('/experiences/:id',userController.deleteExperience);
+
+// Education CRUD
+protectedRouter.post('/educations',      userController.addEducation);
+protectedRouter.put('/educations/:id',   userController.updateEducation);
+protectedRouter.delete('/educations/:id',userController.deleteEducation);
+
+// Skills CRUD
+protectedRouter.post('/skills',      userController.addSkill);
+protectedRouter.delete('/skills/:id',userController.deleteSkill);
+
+// Languages CRUD
+protectedRouter.post('/languages',      userController.addLanguage);
+protectedRouter.delete('/languages/:id',userController.deleteLanguage);
+
+router.use('/', protectedRouter);
+
+module.exports = router;

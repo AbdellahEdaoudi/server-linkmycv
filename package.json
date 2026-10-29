@@ -1,8 +1,8 @@
 {
-  "name": "linkerfolio-server",
+  "name": "linkmycv-server",
   "version": "1.0.0",
   "engines": {
-    "node": "24.x"
+    "node": ">=20.0.0"
   },
   "main": "index.js",
   "scripts": {
@@ -15,23 +15,18 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "bcryptjs": "^2.4.3",
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^16.5.0",
     "express": "^5.2.1",
     "express-rate-limit": "^7.5.1",
-    "google-translate-api-x": "^10.7.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.8.0",
     "ms": "^2.1.3",
     "multer": "^2.2.0",
-    "nodemailer": "^9.0.3",
     "nodemon": "^3.1.14",
-    "redis": "^6.1.0",
-    "sanitize-html": "^2.16.0",
-    "socket.io": "^4.8.3",
-    "tar": "^7.5.18"
+    "sanitize-html": "^2.16.0"
   },
   "overrides": {
     "nodemailer": "^9.0.3",

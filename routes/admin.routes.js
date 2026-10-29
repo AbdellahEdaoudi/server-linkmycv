@@ -1,15 +1,26 @@
-const express = require("express");
-const app = express();
-const AdmineController = require("../controllers/admin.controller");
-const {verifyJWT} = require('../middlewares/verifyJWT');
-const {verifyRole} = require('../middlewares/verifyRole');
+const express = require('express');
+const router = express.Router();
+const adminController = require('../controllers/admin.controller');
+const { contactImageMiddleware } = require('../controllers/contacte.controller');
+const { verifyJWT } = require('../middlewares/verifyJWT');
+const { verifyRole } = require('../middlewares/verifyRole');
 
-// Message Routes
-app.post('/register',AdmineController.registerAdmin);
-app.post('/login',AdmineController.loginAdmin);
-app.post('/refresh',AdmineController.refresh);
-app.post('/logout',AdmineController.logout);
-app.get('/admin',verifyJWT,verifyRole("admin"), AdmineController.getAllAdmins);
-app.delete('/admin/:id',verifyJWT,verifyRole("admin"),AdmineController.deleteAdminById);
+// Admin Guard: All routes in this router require a valid JWT token AND role === 'admin'
+router.use(verifyJWT, verifyRole('admin'));
 
-module.exports = app;
+// System & Dashboard Stats
+router.get('/stats', adminController.getDashboardStats);
+
+// User Management
+router.get('/users', adminController.getAllUsers);
+router.put('/users/:id/role', adminController.updateUserRole);
+router.delete('/users/:id', adminController.deleteUser);
+
+// Contacts / Replies Management
+router.get('/contacts', adminController.getAllContacts);
+router.post('/contacts/:id/replies', contactImageMiddleware, adminController.replyToContact);
+router.put('/contacts/:id/replies/:messageId', contactImageMiddleware, adminController.updateReply);
+router.delete('/contacts/:id/replies/:messageId', adminController.deleteReply);
+router.delete('/contacts/:id', adminController.deleteContact);
+
+module.exports = router;

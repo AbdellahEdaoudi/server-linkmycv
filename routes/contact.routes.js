@@ -1,16 +1,21 @@
-const express = require("express");
-const app = express();
-const ContacteController = require("../controllers/contacte.controller");
-const isAuthenticated = require('../middlewares/isAuthenticated');
+const express = require('express');
+const router = express.Router();
+const contactController = require('../controllers/contacte.controller');
 const { contactLimiter } = require('../Limiting/contactLimiter');
-const {verifyJWT} = require('../middlewares/verifyJWT');
-const {verifyRole} = require('../middlewares/verifyRole');
+const { verifyJWT } = require('../middlewares/verifyJWT');
 
-// Contacts Request Routes
-app.get('/',isAuthenticated, ContacteController.getContacts);
-app.get('/:id', isAuthenticated, ContacteController.getContactById);
-app.post('/', isAuthenticated,contactLimiter,ContacteController.createContact);
-app.put('/:id', isAuthenticated, ContacteController.updateContactById);
-app.delete('/:id',isAuthenticated, ContacteController.deleteContactById);
+router.use(verifyJWT, contactLimiter);
 
-module.exports = app;
+router.get('/', contactController.getMyContacts);
+router.post('/', contactController.contactImageMiddleware, contactController.createContact);
+router.post('/:id/replies', contactController.contactImageMiddleware, contactController.addReply);
+
+// Reply-level update and soft-delete
+router.put('/:id/replies/:messageId', contactController.contactImageMiddleware, contactController.updateReply);
+router.delete('/:id/replies/:messageId', contactController.deleteReply);
+
+// Conversation-level update and delete
+router.put('/:id', contactController.contactImageMiddleware, contactController.updateContactById);
+router.delete('/:id', contactController.deleteContactById);
+
+module.exports = router;
